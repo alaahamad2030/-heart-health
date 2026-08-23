@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>اعرف صحة قلبك</title>
+<style>
+:root{--ink:#172033;--muted:#687386;--line:#e3e8ef;--bg:#f5f7fa;--card:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(900px,100%);background:var(--card);border-radius:30px;padding:32px;box-shadow:0 10px 35px rgba(23,32,51,.10);text-align:center}
+.heart{font-size:64px;margin-bottom:8px}
+h1{font-size:40px;margin:0 0 12px;font-weight:800}
+h2{font-size:31px;margin:0 0 14px}
+.lead{font-size:21px;line-height:1.7;color:#303b4d;max-width:720px;margin:0 auto}
+.note{font-size:14px;color:var(--muted);line-height:1.6;margin-top:22px}
+.btn{border:0;background:var(--ink);color:white;border-radius:18px;padding:18px 30px;font-size:22px;font-weight:800;margin-top:25px;min-width:250px;cursor:pointer}
+.progress{height:9px;background:#e9edf2;border-radius:9px;overflow:hidden;margin-bottom:28px}
+.progress>div{height:100%;background:var(--ink);width:0;transition:.25s}
+.qcount{color:var(--muted);font-size:17px;margin-bottom:10px}
+.question{font-size:29px;font-weight:800;line-height:1.5;max-width:760px;margin:0 auto 24px}
+.options{display:grid;gap:14px;max-width:720px;margin:auto}
+.option{appearance:none;width:100%;background:white;border:2px solid var(--line);border-radius:17px;padding:18px;font-size:20px;text-align:right;color:var(--ink);cursor:pointer}
+.option:active{background:#f1f4f8;transform:scale(.99)}
+.resultIcon{font-size:64px}
+.resultTitle{font-size:30px;font-weight:850;margin:10px 0}
+.score{font-size:25px;font-weight:800;margin:10px 0 16px}
+.resultText,.tip{font-size:20px;line-height:1.75;max-width:700px;margin:10px auto}
+.tip{background:#f2f5f8;border-radius:18px;padding:17px 20px;margin-top:20px}
+.secondary{background:white;color:var(--ink);border:2px solid var(--line);font-size:18px;margin-top:12px}
+.hidden{display:none}
+@media(max-width:600px){.card{padding:24px 17px;border-radius:24px}h1{font-size:31px}.question{font-size:24px}.lead{font-size:18px}.option{font-size:18px;padding:17px}.btn{width:100%;font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+
+<section id="start">
+<div class="heart">🫀</div>
+<h1>اعرف صحة قلبك</h1>
+<p class="lead">أجب عن 7 أسئلة قصيرة واكتشف مستوى بعض العادات وعوامل الخطورة المرتبطة بصحة القلب.</p>
+<button class="btn" id="startBtn">ابدأ التقييم</button>
+<div class="note">نشاط توعوي فقط، وليس تشخيصًا طبيًا أو تقديرًا فرديًا لخطر الإصابة بأمراض القلب.</div>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="progress"><div id="bar"></div></div>
+<div class="qcount" id="qcount"></div>
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+</section>
+
+<section id="result" class="hidden">
+<div class="resultIcon" id="resultIcon">❤️</div>
+<div class="resultTitle" id="resultTitle"></div>
+<div class="score" id="score"></div>
+<p class="resultText" id="resultText"></p>
+<div class="tip" id="tip"></div>
+<button class="btn" id="walkBtn">➡️ اتجه لاستلام وصفة المشي الخاصة بك</button>
+<button class="btn secondary" id="againBtn">إعادة التقييم</button>
+<div class="note">النتيجة مؤشر توعوي مبني على إجابات هذا النشاط، ولا تعني تشخيصًا أو حكمًا على صحة القلب.</div>
+</section>
+
+<section id="finish" class="hidden">
+<div class="heart">🚶🏻‍♀️❤️</div>
+<h2>الخطوة التالية</h2>
+<p class="lead">توجّه الآن إلى محطة <strong>وصفة المشي الخاصة بك</strong> للحصول على توصية حركية مناسبة لك من فريق العلاج الطبيعي.</p>
+<button class="btn" id="restartBtn">بدء تقييم جديد</button>
+</section>
+
+</main></div>
+
+<script>
+(function(){
+"use strict";
+const qs=[
+{q:"كم يومًا في الأسبوع تمارس نشاطًا بدنيًا متوسط الشدة لمدة 30 دقيقة أو أكثر؟",o:[["5 أيام أو أكثر",15],["3–4 أيام",12],["1–2 يوم",7],["لا أمارس",0]]},
+{q:"كيف تقضي معظم يومك؟",o:[["أتحرك كثيرًا خلال اليوم",10],["أجلس جزءًا من اليوم وأتحرك أحيانًا",7],["أجلس معظم اليوم",3],["أجلس تقريبًا طوال اليوم",0]]},
+{q:"هل لديك تشخيص بارتفاع ضغط الدم؟",o:[["لا",15],["غير متأكد",8],["نعم، وأتابعه مع الطبيب",7],["نعم، وغير متابع حاليًا",0]]},
+{q:"ما وضع التدخين لديك؟",o:[["لا أدخن",15],["كنت أدخن وتوقفت",12],["أدخن أحيانًا",5],["أدخن بانتظام",0]]},
+{q:"هل لديك تشخيص بمرض السكري؟",o:[["لا",10],["غير متأكد",5],["نعم",3]]},
+{q:"هل سبق أن أخبرك مختص أن وزنك ضمن النطاق الصحي بالنسبة لطولك؟",o:[["نعم",10],["غير متأكد",5],["لا",3]]},
+{q:"هل يوجد في عائلتك تاريخ لمرض قلبي مبكر؟",o:[["لا",10],["غير متأكد",5],["نعم",3]]}
+];
+let i=0,total=0;
+const $=id=>document.getElementById(id);
+function screen(id){["start","quiz","result","finish"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function start(){i=0;total=0;screen("quiz");render();}
+function render(){
+ const x=qs[i]; $("qcount").textContent="السؤال "+(i+1)+" من "+qs.length;
+ $("bar").style.width=((i/qs.length)*100)+"%"; $("question").textContent=x.q;
+ const box=$("options");box.innerHTML="";
+ x.o.forEach(a=>{const b=document.createElement("button");b.className="option";b.type="button";b.textContent=a[0];
+ b.addEventListener("click",function(){total+=a[1];i++;if(i<qs.length)render();else result();},{once:true});box.appendChild(b);});
+}
+function result(){
+ const score=Math.round(total/85*100);$("score").textContent="مؤشر توعوي: "+score+" / 100";
+ if(score>=70){$("resultIcon").textContent="💚";$("resultTitle").textContent="قلبك يحب أسلوب حياتك";$("resultText").textContent="لديك عادات جيدة تدعم صحة القلب. استمر في الحركة وحافظ على المتابعة الدورية لعوامل الخطورة.";$("tip").textContent="🚶🏻‍♀️ خطوتك القادمة: حافظ على نشاطك واجعل الحركة جزءًا ثابتًا من أسبوعك."}
+ else if(score>=40){$("resultIcon").textContent="💛";$("resultTitle").textContent="قلبك يقول: زِد الحركة شوي";$("resultText").textContent="لديك بعض العادات أو عوامل الخطورة التي تستحق الاهتمام. اختر خطوة واحدة قابلة للاستمرار وابدأ بها.";$("tip").textContent="🚶🏻‍♀️ خطوتك القادمة: قلّل الجلوس وزِد نشاطك تدريجيًا بما يناسب قدرتك."}
+ else{$("resultIcon").textContent="❤️‍🩹";$("resultTitle").textContent="قلبك يحتاج اهتمامك";$("resultText").textContent="لديك عدة عوامل تستحق المراجعة. تحدث مع المختص المناسب لوضع خطة تناسب حالتك الصحية.";$("tip").textContent="🚶🏻‍♀️ خطوتك القادمة: ابدأ بخطوة صحية بسيطة، واطلب التوجيه من المختص قبل زيادة شدة النشاط إذا كانت لديك حالة صحية."}
+ screen("result");
+}
+$("startBtn").addEventListener("click",start);
+$("walkBtn").addEventListener("click",()=>screen("finish"));
+$("againBtn").addEventListener("click",start);
+$("restartBtn").addEventListener("click",start);
+})();
+</script>
+</body>
+</html>
