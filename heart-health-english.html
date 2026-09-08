@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Your Heart Health</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+    color: #17324d;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .card {
+    width: 100%;
+    max-width: 560px;
+    background: white;
+    border-radius: 24px;
+    padding: 28px 22px;
+    box-shadow: 0 10px 35px rgba(30,70,100,.10);
+    align-self: flex-start;
+  }
+  .heart { font-size: 52px; text-align: center; margin-bottom: 4px; }
+  h1 {
+    text-align: center;
+    margin: 0 0 10px;
+    font-size: 30px;
+    color: #17324d;
+  }
+  .intro {
+    text-align: center;
+    line-height: 1.7;
+    color: #5b6f82;
+    margin: 0 auto 20px;
+  }
+  .notice {
+    background: #f1f7fb;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #5b6f82;
+    margin: 16px 0;
+  }
+  button {
+    width: 100%;
+    border: 0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #1976a8;
+    color: white;
+    margin-top: 8px;
+  }
+  button.secondary { background: #edf4f8; color: #1976a8; }
+  .question { margin: 20px 0; }
+  .question h3 { margin: 0 0 12px; font-size: 18px; line-height: 1.45; }
+  .option {
+    display: block;
+    background: #f7fafc;
+    border: 1px solid #dce8ef;
+    border-radius: 12px;
+    padding: 12px 13px;
+    margin: 9px 0;
+    cursor: pointer;
+    line-height: 1.45;
+  }
+  .option input { margin-right: 9px; }
+  .hidden { display: none; }
+  .result {
+    text-align: center;
+    padding: 20px 10px 8px;
+  }
+  .result-icon { font-size: 48px; }
+  .result h2 { margin: 8px 0 10px; font-size: 25px; }
+  .result p { line-height: 1.7; color: #5b6f82; }
+  .score {
+    font-size: 14px;
+    color: #718596;
+    margin-top: 8px;
+  }
+  .next {
+    margin-top: 18px;
+    padding: 18px;
+    background: #f5faf7;
+    border-radius: 16px;
+  }
+  .next h3 { margin-top: 0; }
+  .footer-note {
+    text-align: center;
+    color: #8293a1;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 18px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <section id="start">
+    <div class="heart">🫀</div>
+    <h1>Know Your Heart Health</h1>
+    <p class="intro">
+      Answer 7 short questions to explore some lifestyle habits and risk factors related to heart health.
+    </p>
+    <button onclick="startAssessment()">Start Assessment</button>
+    <div class="notice">
+      Educational activity only. It is not a medical diagnosis or an individual cardiovascular risk assessment.
+    </div>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div id="questions"></div>
+    <button onclick="calculateResult()">See My Result</button>
+  </section>
+
+  <section id="result" class="hidden result">
+    <div id="resultIcon" class="result-icon"></div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+    <div class="score" id="scoreText"></div>
+
+    <div class="next">
+      <h3>🚶🏻‍♀️❤️ Next Step</h3>
+      <p>Go to the Walking Prescription Station to receive a suitable movement recommendation from the Physical Therapy team.</p>
+      <button onclick="walkingPrescription()">➡️ Go to Your Walking Prescription</button>
+    </div>
+
+    <div class="notice">
+      This result is an educational indicator based on your answers. It does not diagnose heart disease or determine your individual cardiovascular risk.
+    </div>
+
+    <button class="secondary" onclick="restart()">Start a New Assessment</button>
+  </section>
+
+</div>
+
+<script>
+const questions = [
+  {
+    title: "🚶🏻 Physical Activity<br>How many days per week do you do moderate-intensity physical activity for 30 minutes or more?",
+    options: [
+      ["5 days or more",15], ["3–4 days",12], ["1–2 days",7], ["I do not exercise",0]
+    ]
+  },
+  {
+    title: "🪑 Sitting<br>How do you spend most of your day?",
+    options: [
+      ["I move around a lot",10],
+      ["I sit part of the day and move sometimes",7],
+      ["I sit most of the day",3],
+      ["I sit almost all day",0]
+    ]
+  },
+  {
+    title: "🩺 Blood Pressure<br>Do you have high blood pressure?",
+    options: [
+      ["No",15],
+      ["Not sure",8],
+      ["Yes, but it is monitored/controlled",7],
+      ["Yes, and it is not being monitored",0]
+    ]
+  },
+  {
+    title: "🚭 Smoking<br>Which best describes you?",
+    options: [
+      ["I do not smoke",15],
+      ["I used to smoke but quit",12],
+      ["I smoke occasionally",5],
+      ["I smoke regularly",0]
+    ]
+  },
+  {
+    title: "🍬 Diabetes<br>Do you have diabetes?",
+    options: [
+      ["No",10], ["Not sure",5], ["Yes",3]
+    ]
+  },
+  {
+    title: "⚖️ Weight<br>Do you know your BMI, or has a healthcare professional told you that your weight is within a healthy range?",
+    options: [
+      ["Yes, within the healthy range",10],
+      ["Not sure",5],
+      ["No, outside the healthy range",3]
+    ]
+  },
+  {
+    title: "❤️ Family History<br>Is there a family history of early heart disease?",
+    options: [
+      ["No",10], ["Not sure",5], ["Yes",3]
+    ]
+  }
+];
+
+function startAssessment() {
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById("questions");
+  container.innerHTML = "";
+  questions.forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "question";
+    let html = `<h3>${i+1}. ${q.title}</h3>`;
+    q.options.forEach((opt, j) => {
+      html += `<label class="option">
+        <input type="radio" name="q${i}" value="${opt[1]}"> ${opt[0]}
+      </label>`;
+    });
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+}
+
+function calculateResult() {
+  let raw = 0;
+  for (let i = 0; i < questions.length; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!selected) {
+      alert("Please answer all 7 questions before viewing your result.");
+      return;
+    }
+    raw += Number(selected.value);
+  }
+
+  const score = Math.round((raw / 85) * 100);
+  let icon, title, text;
+
+  if (score >= 70) {
+    icon = "💚";
+    title = "Your heart likes your lifestyle ❤️";
+    text = "You have several positive habits supporting heart health. Keep moving regularly and continue appropriate health follow-up.";
+  } else if (score >= 40) {
+    icon = "💛";
+    title = "Your heart says: move a little more 😉";
+    text = "Some habits or risk factors deserve attention. Try to increase movement, reduce prolonged sitting, and follow up on relevant health factors.";
+  } else {
+    icon = "❤️‍🩹";
+    title = "Your heart needs your attention";
+    text = "Several factors may be worth reviewing. Consider speaking with the appropriate healthcare professional and gradually increasing physical activity when appropriate.";
+  }
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("resultIcon").textContent = icon;
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultText").textContent = text;
+  document.getElementById("scoreText").textContent = "Educational score: " + score + "/100";
+}
+
+function walkingPrescription() {
+  alert("Please proceed to the Walking Prescription Station.");
+}
+
+function restart() {
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("start").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
